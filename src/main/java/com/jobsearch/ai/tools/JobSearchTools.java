@@ -13,6 +13,8 @@ import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 import static com.jobsearch.ai.data.constant.ChatClientConstants.TOKEN;
 import static java.util.Objects.isNull;
 
@@ -21,72 +23,89 @@ import static java.util.Objects.isNull;
 @RequiredArgsConstructor
 public class JobSearchTools {
 
-  private final JobSearchApiClient jobSearchApiClient;
+    private final JobSearchApiClient jobSearchApiClient;
 
-  @Tool(description = """
-      Search for job postings by position title, city, and optionally working preference.
-      Returns a list of matching job postings.
-      """)
-  public Page<JobPostingResponseDto>
-  searchJobs(@ToolParam(description = "Job position or title keyword to search for, e.g. 'web developer', 'frontend'")
-             String position,
-             @ToolParam(description = "City name to search in, e.g. 'Istanbul', 'Ankara'") String city,
-             @ToolParam(description = "Working preference: FULLTIME, PARTTIME, REMOTE, or HYBRID. Optional.",
-                        required = false) String workingPreference,
-             ToolContext toolContext) {
-    String token = (String) toolContext.getContext().get(TOKEN);
-    log.info("AI tool: searchJobs position={}, city={}, workingPreference={}", position, city, workingPreference);
-    try {
-      ResponseEntity<Page<JobPostingResponseDto>> response =
-          jobSearchApiClient.searchJobs(position, city, workingPreference, 0, 5, token);
-      if (isNull(response) || !response.getStatusCode().is2xxSuccessful()) {
-        throw new RuntimeException();
-      }
-      return response.getBody();
-    } catch (Exception exception) {
-      log.error("searchJobs tool error: {}", exception.getMessage());
-      throw exception;
-    }
-  }
-
-  @Tool(description = """
-      Get detailed information about a specific job posting including description, location, company,
-      and related jobs. Use the job ID from search results.
-      """)
-  public JobDetailResponseDto
-  getJobDetail(@ToolParam(description = "The UUID of the job posting to retrieve details for") String jobId,
+    @Tool(description = """
+            Search for job postings by position title, city, and optionally working preference.
+            Returns a list of matching job postings.
+            """)
+    public Page<JobPostingResponseDto>
+    searchJobs(@ToolParam(description = "Job position or title keyword to search for, e.g. 'web developer', 'frontend'")
+               String position,
+               @ToolParam(description = "Country id to search in") UUID countryId,
+               @ToolParam(description = "City id to search in") UUID cityId,
+               @ToolParam(description = "Town id to search in") UUID townId,
+               @ToolParam(description = "Country name to search in, e.g. 'Turkey', 'Spain'") String countryName,
+               @ToolParam(description = "City name to search in, e.g. 'Istanbul', 'Ankara'") String cityName,
+               @ToolParam(description = "Town name to search in, e.g. 'Karşıyaka', 'Bornova'") String townName,
+               @ToolParam(description = "Working preference: FULLTIME, PARTTIME, REMOTE, or HYBRID. Optional.",
+                       required = false) String workingPreference,
                ToolContext toolContext) {
-    String token = (String) toolContext.getContext().get(TOKEN);
-    log.info("AI tool: getJobDetail jobId={}", jobId);
-    try {
-      ResponseEntity<JobDetailResponseDto> response = jobSearchApiClient.getJobDetail(jobId, token);
-      if (isNull(response) || !response.getStatusCode().is2xxSuccessful()) {
-        throw new RuntimeException();
-      }
-      return response.getBody();
-    } catch (Exception exception) {
-      log.error("getJobDetail tool error: {}", exception.getMessage());
-      throw exception;
+        String token = (String) toolContext.getContext().get(TOKEN);
+        log.info("AI tool: searchJobs position={}, city={}, workingPreference={}", position, cityName, workingPreference);
+        try {
+            ResponseEntity<Page<JobPostingResponseDto>> response =
+                    jobSearchApiClient.searchJobs(
+                            position,
+                            countryId,
+                            cityId,
+                            townId,
+                            countryName,
+                            cityName,
+                            townName,
+                            workingPreference,
+                            0,
+                            5,
+                            token);
+            if (isNull(response) || !response.getStatusCode().is2xxSuccessful()) {
+                throw new RuntimeException();
+            }
+            return response.getBody();
+        } catch (Exception exception) {
+            log.error("searchJobs tool error: {}", exception.getMessage());
+            throw exception;
+        }
     }
-  }
 
-  @Tool(description = """
-      Apply to a job posting on behalf of the authenticated user. Requires the user to be logged in. "
-      Use the job ID from search results.
-      """)
-  public ApplyResponseDto applyToJob(@ToolParam(description = "The UUID of the job posting to apply to") String jobId,
-                                     ToolContext toolContext) {
-    String token = (String) toolContext.getContext().get(TOKEN);
-    log.info("AI tool: applyToJob jobId={}", jobId);
-    try {
-      ResponseEntity<ApplyResponseDto> response = jobSearchApiClient.applyToJob(jobId, token);
-      if (isNull(response) || !response.getStatusCode().is2xxSuccessful()) {
-        throw new RuntimeException();
-      }
-      return response.getBody();
-    } catch (Exception exception) {
-      log.error("applyToJob tool error: {}", exception.getMessage());
-      throw exception;
+    @Tool(description = """
+            Get detailed information about a specific job posting including description, location, company,
+            and related jobs. Use the job ID from search results.
+            """)
+    public JobDetailResponseDto
+    getJobDetail(@ToolParam(description = "The UUID of the job posting to retrieve details for") UUID jobId,
+                 ToolContext toolContext) {
+        String token = (String) toolContext.getContext().get(TOKEN);
+        log.info("AI tool: getJobDetail jobId={}", jobId);
+        try {
+            ResponseEntity<JobDetailResponseDto> response =
+                    jobSearchApiClient.getJobDetail(jobId, token);
+            if (isNull(response) || !response.getStatusCode().is2xxSuccessful()) {
+                throw new RuntimeException();
+            }
+            return response.getBody();
+        } catch (Exception exception) {
+            log.error("getJobDetail tool error: {}", exception.getMessage());
+            throw exception;
+        }
     }
-  }
+
+    @Tool(description = """
+            Apply to a job posting on behalf of the authenticated user. Requires the user to be logged in. "
+            Use the job ID from search results.
+            """)
+    public ApplyResponseDto applyToJob(@ToolParam(description = "The UUID of the job posting to apply to") UUID jobId,
+                                       ToolContext toolContext) {
+        String token = (String) toolContext.getContext().get(TOKEN);
+        log.info("AI tool: applyToJob jobId={}", jobId);
+        try {
+            ResponseEntity<ApplyResponseDto> response = jobSearchApiClient.applyToJob(jobId, token);
+            if (isNull(response) || !response.getStatusCode().is2xxSuccessful()) {
+                throw new RuntimeException();
+            }
+            return response.getBody();
+        } catch (Exception exception) {
+            log.error("applyToJob tool error: {}", exception.getMessage());
+            throw exception;
+        }
+    }
 }

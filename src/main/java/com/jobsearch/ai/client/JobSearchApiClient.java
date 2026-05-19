@@ -12,22 +12,29 @@ import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
 
+import java.util.UUID;
+
 @HttpExchange
 public interface JobSearchApiClient {
 
   @GetExchange("/api/v1/jobs")
   ResponseEntity<Page<JobPostingResponseDto>> searchJobs(@RequestParam(required = false) String position,
-                                                         @RequestParam(required = false) String city,
+                                                         @RequestParam(required = false) UUID countryId,
+                                                         @RequestParam(required = false) UUID cityId,
+                                                         @RequestParam(required = false) UUID townId,
+                                                         @RequestParam(required = false) String countryName,
+                                                         @RequestParam(required = false) String cityName,
+                                                         @RequestParam(required = false) String townName,
                                                          @RequestParam(required = false) String workingPreference,
                                                          @RequestParam(defaultValue = "0") int page,
                                                          @RequestParam(defaultValue = "5") int size,
                                                          @RequestHeader("Authorization") String token);
 
   @GetExchange("/api/v1/jobs/{id}")
-  ResponseEntity<JobDetailResponseDto> getJobDetail(@PathVariable String id,
+  ResponseEntity<JobDetailResponseDto> getJobDetail(@PathVariable UUID id,
                                                     @RequestHeader("Authorization") String token);
 
   @PostExchange("/api/v1/jobs/{id}/apply")
-  ResponseEntity<ApplyResponseDto> applyToJob(@PathVariable String id,
+  ResponseEntity<ApplyResponseDto> applyToJob(@PathVariable UUID id,
                                               @RequestHeader("Authorization") String token);
 }
