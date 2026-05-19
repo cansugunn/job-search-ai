@@ -17,6 +17,7 @@ import java.util.UUID;
 
 import static com.jobsearch.ai.data.constant.ChatClientConstants.TOKEN;
 import static java.util.Objects.isNull;
+import static java.util.UUID.fromString;
 
 @Slf4j
 @Component
@@ -32,9 +33,6 @@ public class JobSearchTools {
     public Page<JobPostingResponseDto>
     searchJobs(@ToolParam(description = "Job position or title keyword to search for, e.g. 'web developer', 'frontend'")
                String position,
-               @ToolParam(description = "Country id to search in") UUID countryId,
-               @ToolParam(description = "City id to search in") UUID cityId,
-               @ToolParam(description = "Town id to search in") UUID townId,
                @ToolParam(description = "Country name to search in, e.g. 'Turkey', 'Spain'") String countryName,
                @ToolParam(description = "City name to search in, e.g. 'Istanbul', 'Ankara'") String cityName,
                @ToolParam(description = "Town name to search in, e.g. 'Karşıyaka', 'Bornova'") String townName,
@@ -47,9 +45,9 @@ public class JobSearchTools {
             ResponseEntity<Page<JobPostingResponseDto>> response =
                     jobSearchApiClient.searchJobs(
                             position,
-                            countryId,
-                            cityId,
-                            townId,
+                            null,
+                            null,
+                            null,
                             countryName,
                             cityName,
                             townName,
@@ -72,13 +70,13 @@ public class JobSearchTools {
             and related jobs. Use the job ID from search results.
             """)
     public JobDetailResponseDto
-    getJobDetail(@ToolParam(description = "The UUID of the job posting to retrieve details for") UUID jobId,
+    getJobDetail(@ToolParam(description = "The UUID of the job posting to retrieve details for") String jobId,
                  ToolContext toolContext) {
         String token = (String) toolContext.getContext().get(TOKEN);
         log.info("AI tool: getJobDetail jobId={}", jobId);
         try {
             ResponseEntity<JobDetailResponseDto> response =
-                    jobSearchApiClient.getJobDetail(jobId, token);
+                    jobSearchApiClient.getJobDetail(fromString(jobId), token);
             if (isNull(response) || !response.getStatusCode().is2xxSuccessful()) {
                 throw new RuntimeException();
             }
@@ -93,12 +91,12 @@ public class JobSearchTools {
             Apply to a job posting on behalf of the authenticated user. Requires the user to be logged in. "
             Use the job ID from search results.
             """)
-    public ApplyResponseDto applyToJob(@ToolParam(description = "The UUID of the job posting to apply to") UUID jobId,
+    public ApplyResponseDto applyToJob(@ToolParam(description = "The UUID of the job posting to apply to") String jobId,
                                        ToolContext toolContext) {
         String token = (String) toolContext.getContext().get(TOKEN);
         log.info("AI tool: applyToJob jobId={}", jobId);
         try {
-            ResponseEntity<ApplyResponseDto> response = jobSearchApiClient.applyToJob(jobId, token);
+            ResponseEntity<ApplyResponseDto> response = jobSearchApiClient.applyToJob(fromString(jobId), token);
             if (isNull(response) || !response.getStatusCode().is2xxSuccessful()) {
                 throw new RuntimeException();
             }
