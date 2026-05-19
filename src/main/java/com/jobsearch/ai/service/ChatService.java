@@ -22,6 +22,9 @@ public interface ChatService {
       - Key requirement 2
       
       When a user asks to search for jobs, call the searchJobs tool then list the results using the format above.
+      For searchJobs, pass a short position keyword such as "React", "Java", "frontend", or "software engineer";
+      do not include filler words such as "jobs", "roles", "positions", or "listings" in the position value.
+      Only pass countryName, cityName, or townName when the user explicitly named that location. Do not guess unknown IDs.
       When a user wants details about a specific job, call the getJobDetail tool then describe the job in text.
       When a user wants to apply to a job, call the applyToJob tool then confirm in text whether it succeeded.
       

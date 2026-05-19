@@ -31,11 +31,15 @@ public class JobSearchTools {
             Returns a list of matching job postings.
             """)
     public Page<JobPostingResponseDto>
-    searchJobs(@ToolParam(description = "Job position or title keyword to search for, e.g. 'web developer', 'frontend'")
+    searchJobs(@ToolParam(description = "Job position or title keyword to search for, e.g. 'web developer', 'frontend'",
+                       required = false)
                String position,
-               @ToolParam(description = "Country name to search in, e.g. 'Turkey', 'Spain' as lower case in english") String countryName,
-               @ToolParam(description = "City name to search in, e.g. 'Istanbul', 'Ankara' as lower case in english") String cityName,
-               @ToolParam(description = "Town name to search in, e.g. 'Karşıyaka', 'Bornova' as lower case in english") String townName,
+               @ToolParam(description = "Country name to search in, e.g. 'Turkey', 'Spain' as lower case in english",
+                       required = false) String countryName,
+               @ToolParam(description = "City name to search in, e.g. 'Istanbul', 'Ankara' as lower case in english",
+                       required = false) String cityName,
+               @ToolParam(description = "Town name to search in, e.g. 'Karşıyaka', 'Bornova' as lower case in english",
+                       required = false) String townName,
                @ToolParam(description = "Working preference: FULLTIME, PARTTIME, REMOTE, or HYBRID. Optional.",
                        required = false) String workingPreference,
                ToolContext toolContext) {
