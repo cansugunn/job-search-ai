@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.jobsearch.ai.data.constant.ChatClientConstants.BEARER_PREFIX;
+
 @RestController
 @RequestMapping("/api/v1/chats")
 @RequiredArgsConstructor
@@ -29,7 +31,7 @@ public class ChatController {
   @PostMapping
   public ResponseEntity<ChatResponseDto> chat(@Valid @RequestBody ChatRequestDto request,
                                               @AuthenticationPrincipal Jwt jwt) {
-    String bearerToken = "Bearer " + jwt.getTokenValue();
+    String bearerToken = BEARER_PREFIX + jwt.getTokenValue();
     return ResponseEntity.ok(chatService.chat(request, bearerToken));
   }
 }

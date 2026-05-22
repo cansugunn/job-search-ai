@@ -1,5 +1,6 @@
 package com.jobsearch.ai.data.dto.response;
 
-public record ChatResponseDto(String reply) {
+public record ChatResponseDto(String reply,
+                              String conversationId) {
 
 }
